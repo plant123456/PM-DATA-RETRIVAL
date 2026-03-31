@@ -235,3 +235,20 @@ create table if not exists raw_ingest (
 
 create index if not exists idx_raw_ingest_source_time
   on raw_ingest(source, fetched_at desc);
+
+-- =========================
+-- 5. Reconciliation reports
+-- =========================
+
+create table if not exists reconciliation_reports (
+  report_id        uuid primary key default gen_random_uuid(),
+  report_type      text not null,              -- trade_vs_onchain, resolved_vs_redemptions, etc
+  generated_at     timestamptz not null default now(),
+  severity         text not null,              -- info, warning, critical
+  summary          text not null,
+  details          jsonb not null,
+  inserted_at      timestamptz not null default now()
+);
+
+create index if not exists idx_reconciliation_reports_type_time
+  on reconciliation_reports(report_type, generated_at desc);
